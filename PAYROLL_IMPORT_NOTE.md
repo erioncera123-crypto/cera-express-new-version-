@@ -1,0 +1,1 @@
+IMPORTANT: The PDF importer currently reads "Payments Total" per driver, not a field explicitly named "Driver Summary". Verify that Payments Total matches Driver Summary gross in a real settlement before approving imports. Payroll calculation is (gross - E-ZPass tolls) × driver rate (default 50%). Do not assume the PDF mapping is validated.

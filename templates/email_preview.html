@@ -1,0 +1,10 @@
+{% extends 'base.html' %}{% block body %}
+<h1>Review settlement emails</h1><p>Payroll week: <strong>{{week}}</strong>. Confirm amounts and recipient addresses before sending. Each email includes only that driver's PDF.</p>
+<p><a href="{{url_for('index',week=week)}}">← Back to payroll</a></p>
+{% if not smtp_ready %}<div class="notice">Email delivery is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, and SMTP_FROM on the server. No emails can be sent yet.</div>{% endif %}
+<form method="post" action="{{url_for('email_send')}}"><input type="hidden" name="csrf" value="{{csrf}}"><input type="hidden" name="week" value="{{week}}">
+<div class="card"><div class="tablewrap"><table><thead><tr><th>Send</th><th>Driver</th><th>Email</th><th>Gross</th><th>Tolls</th><th>Status</th><th>Statement</th></tr></thead><tbody>
+{% for e in entries %}<tr><td><input style="width:20px" type="checkbox" name="drivers" value="{{e.driver}}" {% if not e.email or e.sent %}disabled{% endif %}></td><td>{{e.driver}}</td><td>{{e.email or 'Missing email'}}</td><td>{{e.gross|money}}</td><td>{{e.toll|money}}</td><td>{{'Sent '+e.sent if e.sent else ('Ready' if e.email else 'Add email first')}}</td><td><a href="{{url_for('statement',week=week,driver=e.driver)}}">PDF</a></td></tr>{% else %}<tr><td colspan="7">No saved payroll for this week.</td></tr>{% endfor %}
+</tbody></table></div></div>
+<div class="card"><label style="display:flex;align-items:center;gap:10px"><input type="checkbox" name="confirm" value="yes" style="width:20px" required> I reviewed the payroll amounts and recipient emails and approve sending the selected statements.</label><p class="small">Already-sent versions are skipped. If payroll figures change, the updated statement can be sent again after review. Sending does not transfer money.</p><button {% if not smtp_ready or not entries %}disabled{% endif %}>Send selected settlement emails</button></div></form>
+{% endblock %}
